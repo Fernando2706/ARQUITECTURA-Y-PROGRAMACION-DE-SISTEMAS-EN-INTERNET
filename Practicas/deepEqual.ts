@@ -76,16 +76,18 @@ var deepEqual=(a:any,b:any):boolean=>{
 
 
  const deepClone=function (a:any) {
-     if(a===null||typeof a!=='object'){
+     if(typeof a!=='object'){
+        //En caso de que a no sea un objeto se retorna
+
          return a;
      }
-     var objClonado=a.constructor()
+     var objClonado=a.constructor()//mediante
      
 
      for(var elementos in a){
-         objClonado[elementos]= deepClone(a[elementos])
+         objClonado[elementos]= deepClone(a[elementos])//mediante recursividad iremos clonando cada elemento
      }
-     return objClonado;
+     return objClonado;//Una vez terminada la recursividad devolvemos el objeto
 }
 console.log(typeof(1));
 
