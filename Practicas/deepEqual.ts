@@ -119,7 +119,7 @@ var deepEqual=(a:object,b:Object):boolean=>{
 
          return a;
      }
-     var objClonado=a.constructor()//mediante
+     var objClonado=a.constructor()
      
 
      for(var elementos in a){
