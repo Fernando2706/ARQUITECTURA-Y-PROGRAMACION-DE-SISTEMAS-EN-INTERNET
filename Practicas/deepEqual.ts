@@ -90,11 +90,10 @@ var deepEqual=(a:any,b:any):boolean=>{
 
  const deepClone=function (a:any) {
      if(typeof a!=='object'){
-        //En caso de que a no sea un objeto se retorna
-
+        
          return a;
      }
-     var objClonado=a.constructor()//mediante
+     var objClonado=a.constructor()
      
 
      for(var elementos in a){
