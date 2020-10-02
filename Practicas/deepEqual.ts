@@ -1,13 +1,7 @@
 //Imprimir, copiar, comparar por valor
 
 
-interface IObjeto{
-    name:string
-    edad:number
-    cena:string[]
-    coche?:boolean
-}
-
+//Creo los objetos que voy a usar en mis funciones
 const persona1={
     name:"Fernando",
     edad:20,
@@ -40,15 +34,34 @@ const persona5={
     name:"Paco",
     edad:20,
     coche:false,
-    genero:'M'
+    genero:'M',
+    amigos:[
+        {
+            name:"Fernando",
+            edad:20
+        }
+    ]
 }
 
-var printObject=(a:any)=>{
+//Funcion para imprimir cualquier Objeto
+
+const printObject=(a:any)=>{
     Object.keys(a).forEach(elemento=>{
-        console.log(elemento +":" +a[elemento]);
+        if(typeof a[elemento]!=='object'){
+
+            
+            console.log(elemento +":" +a[elemento]);
+        }else{
+            console.log(elemento+": ");
+
+            printObject(a[elemento]);
+        }
         
     })
 }
+
+printObject(persona5);
+
 
 var deepEqual=(a:any,b:any):boolean=>{
     let equal:boolean=false;
@@ -89,7 +102,6 @@ var deepEqual=(a:any,b:any):boolean=>{
      }
      return objClonado;//Una vez terminada la recursividad devolvemos el objeto
 }
-console.log(typeof(1));
 
 
 
