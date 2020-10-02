@@ -65,14 +65,15 @@ Object.keys(persona1).forEach(keys=>{
 persona1["name"]
 
 const printObject=(a: object)=>{
-    Object.keys(a).forEach(keys=>{
+    Object.keys(a).forEach(keys=>{//recorro cada elemento del objeto
         if(keys in a){
             if(typeof a[keys as keyof typeof a]==='object'){
+                //si el elemento es otro objeto lo recorro igual hasta llegar al limite
                 console.log(keys+": ");
                 
                 printObject(a[keys as keyof typeof a])
             }else{
-            console.log(keys+": "+a[keys as keyof typeof a]);
+            console.log(keys+": "+a[keys as keyof typeof a]);//imprimo el elemento
             }
             
         }
@@ -90,12 +91,12 @@ printObject(persona5);
 var deepEqual=(a:object,b:Object):boolean=>{
     let equal:boolean=false;
     if(a===b){
-        equal=true;
+        equal=true;//true si a y b tienen la misma referncia
     }else if(a!=null&&b!=null){
         if(Object.keys(a).length!=Object.keys(b).length){
-            equal= false
+            equal= false//si no tienen los mismos elementos no son iguales, asi que devolvemos false
         }else{
-            for(var elemento in a) {
+            for(var elemento in a) {//recorremos los elementos
 
                 if(b.hasOwnProperty(elemento)){
                     equal=deepEqual(a[elemento as keyof typeof a],b[elemento as keyof typeof b]);
