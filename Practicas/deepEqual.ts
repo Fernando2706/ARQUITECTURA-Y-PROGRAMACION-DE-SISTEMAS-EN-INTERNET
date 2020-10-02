@@ -57,8 +57,12 @@ const persona5:Persona={
         }
     ]
 }
+Object.keys(persona1).forEach(keys=>{
+    console.log(typeof [1,2,3]);
+    
+})
 //Funcion para imprimir cualquier Objeto
-
+persona1["name"]
 
 const printObject=(a: object)=>{
     Object.keys(a).forEach(keys=>{
@@ -108,7 +112,7 @@ var deepEqual=(a:object,b:Object):boolean=>{
 }
 
 
- const deepClone=function (a:object) {
+ const deepClone=function (a:object):object {
      if(typeof a!=='object'){
         //En caso de que a no sea un objeto se retorna
 
