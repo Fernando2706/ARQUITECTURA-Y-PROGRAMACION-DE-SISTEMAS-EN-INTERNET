@@ -1,8 +1,14 @@
 //Imprimir, copiar, comparar por valor
 
-
+interface Persona{
+    name:string,
+    edad:number,
+    cena:string[],
+    coche?:boolean
+    amigos?:Persona[]
+}
 //Creo los objetos que voy a usar en mis funciones
-const persona1={
+const persona1:Persona={
     name:"Fernando",
     edad:20,
     cena:[
@@ -10,7 +16,7 @@ const persona1={
     ]
 }
 
-const persona2={
+const persona2:Persona={
     name:"Fernando",
     edad:20,
     cena:[
@@ -18,52 +24,70 @@ const persona2={
         "filete"
     ]
 }
-const persona3={
+const persona3:Persona={
     name:"Fernando",
     edad:20,
-    coche:false
+    coche:false,
+    cena:[
+
+    ]
 }
-const persona4={
+const persona4:Persona={
     name:"Fernando",
     edad:20,
     cena:[
         "patatas"
     ]
 }
-const persona5={
+const persona5:Persona={
     name:"Paco",
     edad:20,
     coche:false,
-    genero:'M',
+    cena:[
+        "sopa",
+        "filetes"
+    ],
     amigos:[
         {
             name:"Fernando",
-            edad:20
+            edad:20,
+            cena:[
+                "patatas"
+            ]
         }
     ]
 }
-
+Object.keys(persona1).forEach(keys=>{
+    console.log(typeof [1,2,3]);
+    
+})
 //Funcion para imprimir cualquier Objeto
+persona1["name"]
 
-const printObject=(a:any)=>{
-    Object.keys(a).forEach(elemento=>{
-        if(typeof a[elemento]!=='object'){
-
+const printObject=(a: object)=>{
+    Object.keys(a).forEach(keys=>{
+        if(keys in a){
+            if(typeof a[keys as keyof typeof a]==='object'){
+                console.log(keys+": ");
+                
+                printObject(a[keys as keyof typeof a])
+            }else{
+            console.log(keys+": "+a[keys as keyof typeof a]);
+            }
             
-            console.log(elemento +":" +a[elemento]);
-        }else{
-            console.log(elemento+": ");
-
-            printObject(a[elemento]);
         }
+        
         
     })
 }
 
+console.log("--------------FUNCION PARA IMPRIMIR OBJETOS--------------");
+
+
 printObject(persona5);
 
 
-var deepEqual=(a:any,b:any):boolean=>{
+var deepEqual=(a:object,b:Object):boolean=>{
     let equal:boolean=false;
     if(a===b){
         equal=true;
@@ -74,7 +98,7 @@ var deepEqual=(a:any,b:any):boolean=>{
             for(var elemento in a) {
 
                 if(b.hasOwnProperty(elemento)){
-                    equal=deepEqual(a[elemento],b[elemento]);
+                    equal=deepEqual(a[elemento as keyof typeof a],b[elemento as keyof typeof b]);
                 }else{
                     return false;
                 }
@@ -88,28 +112,31 @@ var deepEqual=(a:any,b:any):boolean=>{
 }
 
 
- const deepClone=function (a:any) {
+ const deepClone=function (a:object) {
      if(typeof a!=='object'){
-        
+        //En caso de que a no sea un objeto se retorna
+
          return a;
      }
-     var objClonado=a.constructor()
+     var objClonado=a.constructor()//mediante
      
 
      for(var elementos in a){
-         objClonado[elementos]= deepClone(a[elementos])//mediante recursividad iremos clonando cada elemento
+         objClonado[elementos]= deepClone(a[elementos as keyof typeof a])//mediante recursividad iremos clonando cada elemento
      }
      return objClonado;//Una vez terminada la recursividad devolvemos el objeto
 }
 
 
 
+console.log("--------------FUNCION PARA COMPARAR EN PROFUNDIDAD DOS OBJETOS--------------");
 
 console.log(deepEqual(persona1,persona2)); //false
 console.log(deepEqual(persona1,persona4)); //true
 
+console.log("--------------FUNCION PARA CLONAR EN PROFUNDIDAD--------------");
 
-const clone=deepClone(persona1);
+const clone=deepClone(persona5);
 printObject(clone)
 
 
