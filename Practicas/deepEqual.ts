@@ -57,12 +57,8 @@ const persona5:Persona={
         }
     ]
 }
-Object.keys(persona1).forEach(keys=>{
-    console.log(typeof [1,2,3]);
-    
-})
 //Funcion para imprimir cualquier Objeto
-persona1["name"]
+
 
 const printObject=(a: object)=>{
     Object.keys(a).forEach(keys=>{
