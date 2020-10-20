@@ -88,7 +88,15 @@ const courses=db.collection<EpisodeSchema>("EpisodeCollection");
 
 
 episodes.forEach( async (episode)=> {
-    const insertCourse=await courses.insertOne(episode);
+
+    const finded=await db.collection<EpisodeSchema>("EpisodeCollection").findOne({id:episode["id"]});
+    if(finded===null){
+        const insertCourse=await courses.insertOne(episode);
+    }else{
+        console.log("Ya existe este elemento");
+        
+    }
+    
 })
 
 interface IDataLocation{
@@ -109,7 +117,13 @@ while(dataLocation.info.next){
 const location=db.collection<LocationSchema>("LocationCollection");
 
 locations.forEach(async (locationIn)=>{
-    const insertCourse=await location.insertOne(locationIn);
+    const finded=await db.collection<LocationSchema>("LocationCollection").findOne({id:locationIn["id"]});
+    if(finded===null){
+        const location2=await location.insertOne(locationIn);
+    }else{
+        console.log("Ya existe este elemento");
+        
+    }
 })
 
 interface IDataCharacter{
@@ -128,7 +142,13 @@ while(dataCharacter.info.next) {
 
 const characterCollection=db.collection<CharacterSchema>("CharacterCollection");
 character.forEach(async (characters)=>{
-    const insertCourse=await characterCollection.insertOne(characters);
+    const finded=await db.collection<CharacterSchema>("CharacterCollection").findOne({id:characters["id"]});
+    if(finded===null){
+        const characte=await characterCollection.insertOne(characters);
+    }else{
+        console.log("Ya existe este elemento");
+        
+    }
 })
 
 
