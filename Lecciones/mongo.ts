@@ -75,7 +75,7 @@ const url = "https://rickandmortyapi.com/api/episode/";
 let responseEpisodes = await fetch(url);
 let dataEpisodes: IData = await responseEpisodes.json();
 const episodes: EpisodeSchema[]=dataEpisodes.results;
-while(dataEpisodes.info.next){
+while(dataEpisodes.info.next) {
     responseEpisodes=await fetch(dataEpisodes.info.next);
     dataEpisodes=await responseEpisodes.json();
     episodes.push(...dataEpisodes.results);
@@ -150,14 +150,3 @@ character.forEach(async (characters)=>{
         
     }
 })
-
-
-
-
-
-
-
-
-
-
-
