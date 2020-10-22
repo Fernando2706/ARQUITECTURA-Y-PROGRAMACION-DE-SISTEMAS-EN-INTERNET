@@ -131,19 +131,130 @@ routes.get('/locations/:id',async (ctx) =>{
   
   
 });
-routes.get('/characters/:id',async (ctx) =>{
-  const { name }= helpers.getQuery(ctx,{mergeParams:true});
-  if(!name){
-    console.log("no existe");
+routes.get('/characters/:filter',async (ctx) =>{
+  
+  const { filter }= helpers.getQuery(ctx,{mergeParams:true});
+  var id:number=0;
+  var name:string="";
+  var status:string="";
+  var gender:string="";
+  var isId:boolean=false;
+  var isName:boolean=false;
+  var isGender:boolean=false;
+  var isStatus:boolean=false;
+  var type:string="";
+  var result:string=" ";
+  var isType:boolean=true;
+  var aux:string=filter.slice(0);
+  for(var i=0;i<aux.length;i++){
+    if(aux.charAt(i)==='='){
+      isType=false;
+      continue
+      
+    }
+    if(aux.charAt(i)==='$'){
+      
+      if(type==="id"){
+        isId=true;
+        id=Number(result);
+
+      }else if(type==="name"){
+        isName=true;
+        name+=result;
+      }else if(type==="gender"){
+        isGender=true;
+        gender+=result;
+      }else if(type==="status"){
+        isStatus=true;
+        status+=status;
+      }
+      isType=true;
+      type="";
+      result="";
+      continue;
+    }
     
+
+    if(isType){
+        type+=aux.charAt(i);
+    }else{
+      
+        result+=aux.charAt(i);
+    }
+    
+    if(i==filter.length-1){
+      
+      if(type==="id"){
+        isId=true;
+        id=Number(result);
+
+      }else if(type==="name"){
+        isName=true;
+        name+=result;
+      }else if(type==="gender"){
+        isGender=true;
+        gender+=result;
+      }else if(type==="status"){
+        isStatus=true;
+        status+=result;
+      }
+      
+    }
   }
-  const { id }= helpers.getQuery(ctx,{mergeParams:true});
-  //console.log(element);
-  let aux=elementsCharacter.filter((elem)=>elem["id"]===Number(id));
-  ctx.response.body=aux;
   
   
-});
+  let element:CharacterSchema[]=[];
+  if(isId){
+    element=elementsCharacter.filter((elemt)=>elemt["id"]===id);
+  }else{
+      if(isName){
+        element=elementsCharacter.filter((elemt)=>elemt["name"].includes(name));
+        if(isGender){
+
+          element=element.filter((elemt)=>{
+            
+            
+
+            return elemt["gender"]===gender;
+          });
+          if(isStatus){
+            element=element.filter((elemt)=>{
+              return elemt["status"]===status;
+            });
+          }
+        }else if(isStatus){
+          element=element.filter((elemt)=>elemt["status"]===status);
+        }
+      }else if(isGender){
+        
+        element=elementsCharacter.filter((elemt)=>{
+          
+          
+          return elemt["gender"]===gender.slice(1);
+        });
+        if(isStatus){
+          element=element.filter((elemt)=>{
+            
+            return elemt["status"]===status;
+          });
+        }
+      }else if(isStatus){
+        element=elementsCharacter.filter((elemt)=>elemt["status"]===status.slice(1));
+      }
+      
+
+  }
+  
+  
+    
+    ctx.response.body=element;
+  }
+    
+
+  
+  
+  
+);
 
 
 
