@@ -1,7 +1,8 @@
 import { Application, Router, helpers } from 'https://deno.land/x/oak@v6.3.1/mod.ts';
 import { v4 } from 'https://deno.land/std@0.74.0/uuid/mod.ts';
+import { MongoClient} from "https://deno.land/x/mongo@v0.12.1/mod.ts";
+import "https://deno.land/x/dotenv/load.ts";
 
- 
 const port = 8000;
 const app = new Application();
 
@@ -39,34 +40,114 @@ mensajes.set('2',{
     userID:'2'
 });
 
-routes.get('/users', (ctx) => {
-    ctx.response.body = Array.from(usuarios.values());
-  });
-routes.get('/users/:userID',(ctx)=>{
-    const {userID}=helpers.getQuery(ctx,{mergeParams:true});
-    ctx.response.body=usuarios.get(userID);
+interface CharacterSchema {
+  _id: { $oid: string };
+  id: number,
+  name:string,
+  status: string,
+  species: string,
+  type: string,
+  gender: string,
+  origin: number,
+  location: number,
+  image: string,
+  episode: number[],
+}
+
+interface LocationSchema {
+  _id: { $oid: string };
+  id: number;
+  name: string;
+  type: string;
+  dimension: string;
+  residents: number[];
+}
+
+interface EpisodeSchema {
+  _id: { $oid: string };
+  id: number;
+  name: string;
+  air_date: string;
+  episode: string;
+  characters: number[];
+}
+
+const DB_URL = Deno.env.get("DB_URL");
+const DB_NAME = Deno.env.get("DB_NAME");
+
+
+if(!DB_URL || !DB_NAME){
+throw Error("Please define DB_URL and DB_NAME on .env file");
+}
+
+
+
+const client = new MongoClient();
+
+client.connectWithUri(DB_URL);
+const db = client.database(DB_NAME);
+const charactersCollection = db.collection<CharacterSchema>("CharactersCollection");
+const episodesCollection = db.collection<EpisodeSchema>("EpisodesCollection");
+const locationsCollection = db.collection<LocationSchema>("LocationsCollection");
+
+//Traigo todos los elementos de las bases de MongoDB
+let elementsCharacter:CharacterSchema[]=await charactersCollection.find();
+let elementsLocation:LocationSchema[]=await locationsCollection.find();
+let elementsEpisode:EpisodeSchema[]=await episodesCollection.find();
+
+routes.get('/characters',async (ctx) =>{
+     
+    //console.log(element);
+    ctx.response.body=elementsCharacter;
+    
 });
-routes.get('/message', (ctx) => {
-    ctx.response.body = Array.from(mensajes.values());
-  });
-routes.get('/message/:messageID',(ctx)=>{
-    const {messageID}=helpers.getQuery(ctx,{mergeParams:true});
-    ctx.response.body=mensajes.get(messageID);
+routes.get('/locations',async (ctx) =>{
+     
+  //console.log(element);
+  ctx.response.body=elementsLocation;
+  
 });
-routes.post('/messages', async (ctx) => {
-    const id = v4.generate();
-   
-    const { value } = ctx.request.body({ type: 'json' });
-    const { text } = await value;
-   
-    mensajes.set(id, {
-      id,
-      text,
-      userID: '', // TODO
-    });
-   
-    ctx.response.body = mensajes.get(id);
-  });
+routes.get('/episode',async (ctx) =>{
+     
+  //console.log(element);
+  ctx.response.body=elementsEpisode;
+  
+});
+routes.get('/episode/:id',async (ctx) =>{
+  //const { name }= helpers.getQuery(ctx,{mergeParams:true});
+  const { id }= helpers.getQuery(ctx,{mergeParams:true});
+  //console.log(element);
+  let aux=elementsEpisode.filter((elem)=>elem["id"]===Number(id));
+  ctx.response.body=aux;
+  
+  
+});
+routes.get('/locations/:id',async (ctx) =>{
+  //const { name }= helpers.getQuery(ctx,{mergeParams:true});
+  const { id }= helpers.getQuery(ctx,{mergeParams:true});
+  //console.log(element);
+  let aux=elementsLocation.filter((elem)=>elem["id"]===Number(id));
+  ctx.response.body=aux;
+  
+  
+});
+routes.get('/characters/:id',async (ctx) =>{
+  const { name }= helpers.getQuery(ctx,{mergeParams:true});
+  if(!name){
+    console.log("no existe");
+    
+  }
+  const { id }= helpers.getQuery(ctx,{mergeParams:true});
+  //console.log(element);
+  let aux=elementsCharacter.filter((elem)=>elem["id"]===Number(id));
+  ctx.response.body=aux;
+  
+  
+});
+
+
+
+
    
 
 
