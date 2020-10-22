@@ -138,15 +138,4 @@ console.log(deepEqual(persona1,persona4)); //true
 console.log("--------------FUNCION PARA CLONAR EN PROFUNDIDAD--------------");
 
 const clone=deepClone(persona5);
-printObject(clone)
-
-
-
-
-
-
-
-
-
-
-
+printObject(clone);
