@@ -5,265 +5,191 @@ import "https://deno.land/x/dotenv/load.ts";
 
 const port = 8000;
 const app = new Application();
-
+let status:number=0;
 const routes = new Router();
 
-interface User{
-    id:string;
-    name:string;
-}
-interface Message{
-    id:string;
-    text:string;
-    userID:string;
-}
-const usuarios=new Map<string,User>();
-const mensajes=new Map<string,Message>();
-
-usuarios.set('1',{
-    id:'1',
-    name:'Fernando'
-});
-usuarios.set('2',{
-    id:'1',
-    name:'Paco'
-});
-
-mensajes.set('1',{
-    id:'1',
-    text:'Hola Mundo',
-    userID:'1'
-});
-mensajes.set('2',{
-    id:'2',
-    text:'By World',
-    userID:'2'
-});
 
 interface CharacterSchema {
-  _id: { $oid: string };
-  id: number,
+  _id: {$oid:string},
+  id:number,
   name:string,
-  status: string,
-  species: string,
-  type: string,
-  gender: string,
-  origin: number,
-  location: number,
-  image: string,
-  episode: number[],
+  status:string,
+  species:string,
+  type:string,
+  gender:string,
+  origin:number|string,
+  location:number|string,
+  image:string,
+  episode:number[]|string[],
 }
 
 interface LocationSchema {
-  _id: { $oid: string };
-  id: number;
-  name: string;
-  type: string;
-  dimension: string;
-  residents: number[];
+  _id: {$oid:string},
+  id:number,
+  name:string,
+  type:string,
+  dimennsion:string,
+  residents:number[]
 }
 
-interface EpisodeSchema {
-  _id: { $oid: string };
-  id: number;
-  name: string;
-  air_date: string;
-  episode: string;
-  characters: number[];
+interface EpisodeSchema{
+  _id: {$oid:string},
+  id:number,
+  name:string,
+  air_date:string,
+  episode:string,
+  characters:string[]
 }
 
-const DB_URL = Deno.env.get("DB_URL");
-const DB_NAME = Deno.env.get("DB_NAME");
+//const DB_URL=Deno.env.get("DB_URL");
+//const DB_NAME=Deno.env.get("DB_NAME");
+
+//------No utilizo el metode .get de Deno ya que no me funcionaba-------
+const client=new MongoClient();
+client.connectWithUri("mongodb+srv://fernando:fernando@cluster0.mbxwu.mongodb.net/nebrija?retryWrites=true&w=majority");
+const data_base=client.database("nebrija");
+const characterCollection=data_base.collection<CharacterSchema>("CharactersCollection");
+const episodeCollection=data_base.collection<EpisodeSchema>("EpisodesCollection");
+const locationCollection=data_base.collection<LocationSchema>("LocationsCollection");
 
 
-if(!DB_URL || !DB_NAME){
-throw Error("Please define DB_URL and DB_NAME on .env file");
-}
+let characters:CharacterSchema[]=await characterCollection.find();
+let episodes:EpisodeSchema[]=await episodeCollection.find();
+let location:LocationSchema[]=await locationCollection.find();
 
+let getData=  [
+   characters=await characterCollection.find(),
+   episodes=await episodeCollection.find(),
+   location=await locationCollection.find(),
+]
 
-
-const client = new MongoClient();
-
-client.connectWithUri(DB_URL);
-const db = client.database(DB_NAME);
-const charactersCollection = db.collection<CharacterSchema>("CharactersCollection");
-const episodesCollection = db.collection<EpisodeSchema>("EpisodesCollection");
-const locationsCollection = db.collection<LocationSchema>("LocationsCollection");
-
-//Traigo todos los elementos de las bases de MongoDB
-let elementsCharacter:CharacterSchema[]=await charactersCollection.find();
-let elementsLocation:LocationSchema[]=await locationsCollection.find();
-let elementsEpisode:EpisodeSchema[]=await episodesCollection.find();
-
-routes.get('/characters',async (ctx) =>{
-     
-    //console.log(element);
-    ctx.response.body=elementsCharacter;
-    
-});
-routes.get('/locations',async (ctx) =>{
-     
-  //console.log(element);
-  ctx.response.body=elementsLocation;
-  
-});
-routes.get('/episode',async (ctx) =>{
-     
-  //console.log(element);
-  ctx.response.body=elementsEpisode;
-  
-});
-routes.get('/episode/:id',async (ctx) =>{
-  //const { name }= helpers.getQuery(ctx,{mergeParams:true});
-  const { id }= helpers.getQuery(ctx,{mergeParams:true});
-  //console.log(element);
-  let aux=elementsEpisode.filter((elem)=>elem["id"]===Number(id));
-  ctx.response.body=aux;
-  
-  
-});
-routes.get('/locations/:id',async (ctx) =>{
-  //const { name }= helpers.getQuery(ctx,{mergeParams:true});
-  const { id }= helpers.getQuery(ctx,{mergeParams:true});
-  //console.log(element);
-  let aux=elementsLocation.filter((elem)=>elem["id"]===Number(id));
-  ctx.response.body=aux;
-  
-  
-});
-routes.get('/characters/:filter',async (ctx) =>{
-  
-  const { filter }= helpers.getQuery(ctx,{mergeParams:true});
-  var id:number=0;
-  var name:string="";
-  var status:string="";
-  var gender:string="";
-  var isId:boolean=false;
-  var isName:boolean=false;
-  var isGender:boolean=false;
-  var isStatus:boolean=false;
-  var type:string="";
-  var result:string=" ";
-  var isType:boolean=true;
-  var aux:string=filter.slice(0);
-  for(var i=0;i<aux.length;i++){
-    if(aux.charAt(i)==='='){
-      isType=false;
-      continue
-      
+Promise.all(getData);
+const updateArray=()=>{
+  aux.forEach((element)=>{
+    if(element.hasOwnProperty("_id")){
+      //delete element["_id"];
     }
-    if(aux.charAt(i)==='$'){
+    var nameLocation="";
+    var nameOrifin="";
+    var nameEpisode="";
+    location.forEach((key)=>{
       
-      if(type==="id"){
-        isId=true;
-        id=Number(result);
-
-      }else if(type==="name"){
-        isName=true;
-        name+=result;
-      }else if(type==="gender"){
-        isGender=true;
-        gender+=result;
-      }else if(type==="status"){
-        isStatus=true;
-        status+=status;
+      if(key["id"]===element["location"]){
+        nameLocation=key["name"];
       }
-      isType=true;
-      type="";
-      result="";
-      continue;
-    }
-    
-
-    if(isType){
-        type+=aux.charAt(i);
-    }else{
-      
-        result+=aux.charAt(i);
-    }
-    
-    if(i==filter.length-1){
-      
-      if(type==="id"){
-        isId=true;
-        id=Number(result);
-
-      }else if(type==="name"){
-        isName=true;
-        name+=result;
-      }else if(type==="gender"){
-        isGender=true;
-        gender+=result;
-      }else if(type==="status"){
-        isStatus=true;
-        status+=result;
+      if(key["id"]===element["origin"]){
+        nameOrifin=key["name"];
       }
-      
+    })
+    element["location"]=nameLocation;
+    element["origin"]=nameOrifin;
+    var episodiosAux:string[]=[];
+    for(var i = 0;i<element["episode"].length;i++){
+      for(var j = 0; j<episodes.length;j++){
+        if(element["episode"][i]===episodes[j]["id"]){
+          episodiosAux.push(episodes[j]["name"]);
+        }
+      }
     }
-  }
-  
-  
-  let element:CharacterSchema[]=[];
-  if(isId){
-    element=elementsCharacter.filter((elemt)=>elemt["id"]===id);
+    element["episode"]=episodiosAux;
+    
+  });
+}
+
+
+
+
+let aux:CharacterSchema[]=characters.slice();
+updateArray();
+
+
+
+
+routes.get('/character',(ctx)=>{
+  ctx.response.body=characters;
+  ctx.response.status=200;
+});
+
+routes.get('/character/:id',(ctx)=>{
+  const { id }=helpers.getQuery(ctx,{mergeParams:true});
+  let encontrado:boolean=false;
+  aux.forEach(element=>{
+    if(element["id"]===Number(id)){
+      encontrado=true;
+    }
+  });
+  if(encontrado){
+    ctx.response.body=aux.filter(key=>key["id"]===Number(id));
+    ctx.response.status=200;
   }else{
-      if(isName){
-        element=elementsCharacter.filter((elemt)=>elemt["name"].includes(name));
-        if(isGender){
+    ctx.response.body="Not found";
+    ctx.response.status=404
+  }
+})
 
-          element=element.filter((elemt)=>{
-            
-            
-
-            return elemt["gender"]===gender;
-          });
-          if(isStatus){
-            element=element.filter((elemt)=>{
-              return elemt["status"]===status;
-            });
-          }
-        }else if(isStatus){
-          element=element.filter((elemt)=>elemt["status"]===status);
-        }
-      }else if(isGender){
-        
-        element=elementsCharacter.filter((elemt)=>{
-          
-          
-          return elemt["gender"]===gender.slice(1);
-        });
-        if(isStatus){
-          element=element.filter((elemt)=>{
-            
-            return elemt["status"]===status;
-          });
-        }
-      }else if(isStatus){
-        element=elementsCharacter.filter((elemt)=>elemt["status"]===status.slice(1));
+routes.put('/switchstatus/:id',async (ctx)=>{
+  const { id }=helpers.getQuery(ctx,{mergeParams:true});
+  let encontrado:boolean=false;
+  aux.forEach(element=>{
+    if(element["id"]===Number(id)){
+      encontrado=true;
+      if(element["status"]==="Alive"){
+        element["status"]="Dead";
+      }else if(element["status"]==="Dead"){
+        element["status"]="Alive";
       }
-      
-
+    }
+  })
+  
+  if(encontrado){
+    await Promise.all([
+      characterCollection.deleteMany({}),
+    ]);
+    await Promise.all([
+      characterCollection.insertMany(aux),
+    ]);
+    ctx.response.body=aux.filter(key=>key["id"]===Number(id));
+    ctx.response.status=200;
+  }else{
+    ctx.response.body="Not found";
+    ctx.response.status=404
   }
   
   
-    
-    ctx.response.body=element;
+})
+
+routes.delete('/character/:id', async (ctx)=>{
+  const { id }=helpers.getQuery(ctx,{mergeParams:true});
+  let encontrado:boolean=false;
+  aux.forEach(element=>{
+    if(element["id"]===Number(id)){
+      encontrado=true;
+      characterCollection.deleteOne({"id":Number(id)});
+    }
+  })
+  if(encontrado){
+    Promise.all(getData);
+    updateArray();
+    ctx.response.body="OK";
+    ctx.response.status=200;
+  }else{
+    ctx.response.body="Not found";
+  ctx.response.status=404;
   }
-    
-
   
-  
-  
-);
+})
 
 
 
 
-   
-
+routes.get('/status',(ctx)=>{
+  ctx.response.body="OK";
+  ctx.response.status=200;
+})
 
 app.use(routes.routes());
 app.use(routes.allowedMethods());
+
 app.addEventListener('listen', () => {
   console.log(`Listening on localhost:${port}`);
 });
